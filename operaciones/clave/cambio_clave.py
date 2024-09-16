@@ -2,7 +2,10 @@ from operaciones.clave.parametros_cambio_clave import ParametrosCambioClave
 from tipos import RESULTADO, OPERACION
 from estado import Estado
 from constantes import CANTIDAD_CAMBIOS_CLAVE_MES, ahora
-from utiles import contiene_letras_numeros, mismo_mes
+from utiles import (
+    cantidad_cambios_clave_usuario_mes,
+    contiene_letras_numeros,
+)
 
 
 def cambio_clave(solicitud: ParametrosCambioClave):
@@ -21,21 +24,10 @@ def cambio_clave(solicitud: ParametrosCambioClave):
     if not contiene_letras_numeros(solicitud.nueva_clave):
         return RESULTADO.NoCumpleRequisitosClave2
 
-    realizo_cambios_de_clave = (
-        len(
-            list(
-                filter(
-                    lambda m: mismo_mes(m[0])
-                    and m[1] == OPERACION.CLAVE
-                    and m[2] == solicitud.dni,
-                    estado.movimientos,
-                )
-            )
-        )
+    if (
+        cantidad_cambios_clave_usuario_mes(solicitud.dni, estado.movimientos)
         > CANTIDAD_CAMBIOS_CLAVE_MES
-    )
-
-    if realizo_cambios_de_clave:
+    ):
         return RESULTADO.CambioDeClaveBloqueado
 
     estado.usuarios[solicitud.dni].clave = solicitud.nueva_clave

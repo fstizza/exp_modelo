@@ -1,7 +1,7 @@
 from estado import Estado
 from operaciones.extraccion.parametros_extraccion import ParametrosExtraccion
 from tipos import RESULTADO, OPERACION
-from utiles import mismo_dia
+from utiles import cantidad_extracciones_usuario_hoy
 from constantes import CANTIDAD_EXTRACCIONES_MAXIMA_DIA, ahora
 
 
@@ -19,21 +19,10 @@ def extraccion(solicitud: ParametrosExtraccion):
     if usuario.clave != solicitud.clave:
         return RESULTADO.ClaveIncorrecta
 
-    realizo_extracciones = (
-        len(
-            list(
-                filter(
-                    lambda m: mismo_dia(m[0])
-                    and m[1] == OPERACION.EXTRACCION
-                    and m[2] == solicitud.dni,
-                    estado.movimientos,
-                )
-            )
-        )
+    if (
+        cantidad_extracciones_usuario_hoy(solicitud.dni, estado.movimientos)
         > CANTIDAD_EXTRACCIONES_MAXIMA_DIA
-    )
-
-    if realizo_extracciones:
+    ):
         return RESULTADO.NoCumplePoliticaAdelanto
 
     if solicitud.monto > int(usuario.sueldo / 2):
