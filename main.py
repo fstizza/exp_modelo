@@ -1,15 +1,19 @@
-from datetime import datetime
 from os import sys
-from constantes import FORMATO_FECHA
-from extraccion import extraccion, extraccion_parametros_validos
-from alta_usuario import alta_usuario, alta_usuario_parametros_validos
-from cambio_clave import cambio_clave, cambio_clave_parametros_validos
-from carga import carga, carga_parametros_validos
-from consulta_saldo import consulta_saldo, consulta_saldo_parametros_validos
-from consulta_movimientos import (
-    consulta_movimientos,
-    consulta_movimientos_parametros_validos,
+from excepciones import ParametrosInvalidos
+from operaciones.alta.parametros_alta_usuario import ParametrosAltaUsuario
+from operaciones.carga.parametros_carga import ParametrosCarga
+from operaciones.clave.parametros_cambio_clave import ParametrosCambioClave
+from operaciones.extraccion.extraccion import extraccion
+from operaciones.alta.alta_usuario import alta_usuario
+from operaciones.clave.cambio_clave import cambio_clave
+from operaciones.carga.carga import carga
+from operaciones.extraccion.parametros_extraccion import ParametrosExtraccion
+from operaciones.movimientos.parametros_consulta_movimientos import (
+    ParametrosConsultaMovimientos,
 )
+from operaciones.saldo.consulta_saldo import consulta_saldo
+from operaciones.movimientos.consulta_movimientos import consulta_movimientos
+from operaciones.saldo.parametros_consulta_saldo import ParametrosConsultaSaldo
 from tipos import RESULTADO
 
 
@@ -19,51 +23,26 @@ def main(args: list):
         exit(1)
 
     resultado = RESULTADO.Error
-    if args[0] == "extraccion":
-        if extraccion_parametros_validos(args[1:]):
-            resultado = extraccion(args[1], args[2], int(args[3]))
-        else:
-            print("Parametros inválidos")
-    elif args[0] == "clave":
-        if cambio_clave_parametros_validos(args[1:]):
-            resultado = cambio_clave(args[1], args[2], args[3])
-        else:
-            print("Parametros inválidos")
-    elif args[0] == "saldo":
-        if consulta_saldo_parametros_validos(args[1:]):
-            resultado = consulta_saldo(args[1], args[2])
-        else:
-            print("Parametros inválidos")
+    operacion, *argumentos = args
 
-    elif args[0] == "alta":
-        if alta_usuario_parametros_validos(args[1:]):
-            resultado = alta_usuario(
-                args[1], args[2], args[3], args[4], args[5], int(args[6])
-            )
+    try:
+        if operacion == "extraccion":
+            resultado = extraccion(ParametrosExtraccion(argumentos))
+        elif operacion == "clave":
+            resultado = cambio_clave(ParametrosCambioClave(argumentos))
+        elif operacion == "saldo":
+            resultado = consulta_saldo(ParametrosConsultaSaldo(argumentos))
+        elif operacion == "alta":
+            resultado = alta_usuario(ParametrosAltaUsuario(argumentos))
+        elif operacion == "carga":
+            resultado = carga(ParametrosCarga(argumentos))
+        elif operacion == "movimientos":
+            resultado = consulta_movimientos(ParametrosConsultaMovimientos(argumentos))
         else:
-            print("Parametros inválidos")
-
-    elif args[0] == "carga":
-        if carga_parametros_validos(args[1:]):
-            resultado = carga(args[1], args[2], int(args[3]))
-        else:
-            print("Parametros inválidos")
-        pass
-    elif args[0] == "movimientos":
-        if consulta_movimientos_parametros_validos(args[1:]):
-            resultado = consulta_movimientos(
-                args[1],
-                args[2],
-                args[3],
-                datetime.strptime(args[4], FORMATO_FECHA),
-                datetime.strptime(args[5], FORMATO_FECHA),
-            )
-        else:
-            print("Parametros inválidos")
-    else:
-        print("Operación inválida.")
-
-    print(f"Resultado: {resultado.value}")
+            print("Operación inválida.")
+        print(f"Resultado: {resultado.value}")
+    except ParametrosInvalidos:
+        print("Parametros invalidos")
 
 
 if __name__ == "__main__":

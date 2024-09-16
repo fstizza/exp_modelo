@@ -13,3 +13,7 @@ clave_administrador: CLAVE = "123"
 ahora: FECHAHORA = datetime.now()
 
 FORMATO_FECHA = "%Y-%m-%d-%H:%M"
+
+CANTIDAD_EXTRACCIONES_MAXIMA_DIA = 2
+
+CANTIDAD_CAMBIOS_CLAVE_MES = 0
