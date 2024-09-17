@@ -1,37 +1,14 @@
-from tipos import *
-from constantes import *
+from modelos.movimiento import Movimiento
+from modelos.usuario import Usuario
+from modelos.usuario_administrador import obtener_administrador
+from tipos import DNI
 from json import dump, load
-
-
-class Usuario:
-    saldo: MONTO
-    sueldo: MONTO
-    clave: CLAVE
-    nombre: NOMBRE
-    dni: DNI
-
-    def __init__(self, json=None):
-        if json != None:
-            self.saldo = int(json["saldo"])
-            self.sueldo = int(json["sueldo"])
-            self.clave = json["clave"]
-            self.nombre = json["nombre"]
-            self.dni = json["dni"]
-
-    def aJson(self):
-        return {
-            "saldo": self.saldo,
-            "sueldo": self.sueldo,
-            "clave": self.clave,
-            "nombre": self.nombre,
-            "dni": self.dni,
-        }
 
 
 class Estado:
     usuarios: dict[DNI, Usuario]
     saldo: int
-    movimientos: list[MOVIMIENTO]
+    movimientos: list[Movimiento]
 
     def __init__(self):
         self.__leer()
@@ -42,14 +19,7 @@ class Estado:
                 estado_json = load(estado_archivo)
 
                 self.movimientos = list(
-                    map(
-                        lambda m: (
-                            datetime.strptime(m["fecha"], FORMATO_FECHA),
-                            OPERACION(m["op"]),
-                            m["dni"],
-                        ),
-                        estado_json["movimientos"],
-                    )
+                    map(lambda m: Movimiento.desde_json(m), estado_json["movimientos"])
                 )
 
                 usuarios = list(
@@ -65,14 +35,8 @@ class Estado:
             self.guardar()
 
     def __inicial(self):
-        usuario_administrador = Usuario()
-        usuario_administrador.clave = clave_administrador
-        usuario_administrador.nombre = nombre_administrador
-        usuario_administrador.saldo = 0
-        usuario_administrador.sueldo = 0
-        usuario_administrador.dni = dni_administrador
-
-        self.usuarios = {dni_administrador: usuario_administrador}
+        usuario_administrador = obtener_administrador()
+        self.usuarios = {usuario_administrador.dni: usuario_administrador}
         self.saldo = 0
         self.movimientos = []
 
@@ -81,16 +45,7 @@ class Estado:
             dump(
                 {
                     "usuarios": list(map(lambda u: u.aJson(), self.usuarios.values())),
-                    "movimientos": list(
-                        map(
-                            lambda m: {
-                                "fecha": m[0].strftime(FORMATO_FECHA),
-                                "op": int(m[1]),
-                                "dni": m[2],
-                            },
-                            self.movimientos,
-                        )
-                    ),
+                    "movimientos": list(map(lambda m: m.aJson(), self.movimientos)),
                     "saldo": self.saldo,
                 },
                 estado_archivo,

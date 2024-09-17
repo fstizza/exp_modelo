@@ -16,16 +16,16 @@ def consulta_movimientos(solicitud: ParametrosConsultaMovimientos):
         return RESULTADO.UsuarioInexistente
 
     movimientos = filter(
-        lambda m: m[0] >= solicitud.desde
-        and m[0] <= solicitud.hasta
-        and m[2] == solicitud.dni_consulta,
+        lambda m: m.fechahora >= solicitud.desde
+        and m.fechahora <= solicitud.hasta
+        and m.dni == solicitud.dni_consulta,
         estado.movimientos,
     )
 
     print(f"Movimientos del usuario DNI {solicitud.dni_consulta}")
     for movimiento in movimientos:
-        fecha = movimiento[0].strftime("%Y-%m-%d-%H:%M")
-        operacion = movimiento[1]
+        fecha = movimiento.fechahora.strftime("%Y-%m-%d-%H:%M")
+        operacion = movimiento.operacion
         print(f"* {fecha} | {operacion}")
 
     return RESULTADO.OK

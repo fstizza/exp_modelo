@@ -33,5 +33,4 @@ DNI = str
 CLAVE = str
 NOMBRE = str
 FECHAHORA = datetime
-MOVIMIENTO = tuple[FECHAHORA, OPERACION]
 MONTO = int

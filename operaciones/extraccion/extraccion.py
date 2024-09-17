@@ -1,4 +1,5 @@
 from estado import Estado
+from modelos.movimiento import Movimiento
 from operaciones.extraccion.parametros_extraccion import ParametrosExtraccion
 from tipos import RESULTADO, OPERACION
 from utiles import cantidad_extracciones_usuario_hoy
@@ -38,7 +39,7 @@ def extraccion(solicitud: ParametrosExtraccion):
 
     estado.saldo -= solicitud.monto
 
-    estado.movimientos.append((ahora, OPERACION.EXTRACCION, solicitud.dni))
+    estado.movimientos.append(Movimiento(ahora, OPERACION.EXTRACCION, solicitud.dni))
 
     estado.guardar()
 

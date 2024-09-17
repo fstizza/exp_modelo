@@ -1,3 +1,4 @@
+from modelos.movimiento import Movimiento
 from operaciones.clave.parametros_cambio_clave import ParametrosCambioClave
 from tipos import RESULTADO, OPERACION
 from estado import Estado
@@ -32,7 +33,7 @@ def cambio_clave(solicitud: ParametrosCambioClave):
 
     estado.usuarios[solicitud.dni].clave = solicitud.nueva_clave
 
-    estado.movimientos.append((ahora, OPERACION.CLAVE, solicitud.dni))
+    estado.movimientos.append(Movimiento(ahora, OPERACION.CLAVE, solicitud.dni))
 
     estado.guardar()
 

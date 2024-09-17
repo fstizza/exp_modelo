@@ -1,3 +1,4 @@
+from modelos.movimiento import Movimiento
 from tipos import *
 from constantes import ahora, clave_administrador, dni_administrador
 
@@ -25,21 +26,23 @@ def contiene_letras_numeros(clave: CLAVE) -> bool:
     return contiene_letra and contiene_numero
 
 
-def cantidad_extracciones_usuario_hoy(dni: DNI, movimientos: list[MOVIMIENTO]) -> int:
+def cantidad_extracciones_usuario_hoy(dni: DNI, movimientos: list[Movimiento]) -> int:
     movimientos_usuario = filter(
-        lambda m: m[2] == dni and m[1] == OPERACION.EXTRACCION, movimientos
+        lambda m: m.dni == dni and m.operacion == OPERACION.EXTRACCION, movimientos
     )
-    movimientos_usuario_hoy = filter(lambda m: mismo_dia(m[0]), movimientos_usuario)
+    movimientos_usuario_hoy = filter(
+        lambda m: mismo_dia(m.fechahora), movimientos_usuario
+    )
     return len(list(movimientos_usuario_hoy))
 
 
-def cantidad_cambios_clave_usuario_mes(dni: DNI, movimientos: list[MOVIMIENTO]) -> int:
+def cantidad_cambios_clave_usuario_mes(dni: DNI, movimientos: list[Movimiento]) -> int:
     movimientos_clave_usuario = filter(
-        lambda m: m[2] == dni and m[1] == OPERACION.CLAVE,
+        lambda m: m.dni == dni and m.operacion == OPERACION.CLAVE,
         movimientos,
     )
     movimientos_usuario_mes = filter(
-        lambda m: mismo_mes(m[0]),
+        lambda m: mismo_mes(m.fechahora),
         movimientos_clave_usuario,
     )
     return len(list(movimientos_usuario_mes))
